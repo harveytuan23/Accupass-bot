@@ -5,6 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from datetime import datetime
 import time
 import json
 import sys
@@ -61,30 +62,52 @@ if __name__ == '__main__':
     # result = text.upper()
     # print(result)
 
-    with open('keyword.json') as f:
+    with open('./dist/keyword.json') as f:
         keywords = json.load(f)
 
-    url = "https://www.accupass.com/eflow/ticket/2303280702207269355030"
+    url = "https://www.accupass.com/organizer/detail/1909260711508963461450"
     _driver = make_webdriver()
+    set_time = keywords['time']
 
     # Open browser
     _driver.get(url=url)
 
     # import cookies
-    with open('session.json') as f:
+    with open('./dist/session.json') as f:
         cookies = json.load(f)
 
     for cookie in cookies:
         _driver.add_cookie(cookie)
     _driver.refresh()
-    time.sleep(5)
+    time.sleep(10)
 
     # Scroll down the page
     _driver.execute_script("window.scrollBy(0, 500);")
-    time.sleep(0.5)
+    time.sleep(3)
+
+    # Click Friday event
+    Click_Btn(By.XPATH, "//*[contains(text(),'週五')]")
+    time.sleep(3)
+
+    # Click register
+    Click_Btn(By.CLASS_NAME, "OrgInfo-ef8556ff-register-button")
+    time.sleep(3)
+
+    # Refresh until 12:00pm
+    while True:
+        now_time = time.strftime("%H:%M:%S")
+        print(now_time)
+        if (now_time) == set_time:
+            _driver.refresh()
+            # Click "Choose ticket"
+            Click_Btn(
+                By.XPATH, "//select/option[@value='{}']".format(keywords['keyword']))
+            break
+        else:
+            time.sleep(1)
 
     # Click +1 button
-    Click_Btn_refresh(
+    Click_Btn(
         By.XPATH, "//div[@class='Ticket-df72ab0d-container']//*[contains(text(),'{}')]/following::span[@class='Ticket-7b1c6bff-add']".format(keywords['keyword']))
 
     # Click apply button
