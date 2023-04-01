@@ -30,7 +30,7 @@ def create_options() -> Options:
 
 def Click_Btn(by, value):
     try:
-        button = WebDriverWait(_driver, 15).until(
+        button = WebDriverWait(_driver, 15, 2).until(
             EC.visibility_of_element_located((by, value)))
         # button = _driver.find_element(by, value)
         time.sleep(0.5)
